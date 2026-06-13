@@ -157,6 +157,7 @@ lib/
       pages/
         course_list_page.dart
         course_detail_page.dart
+        my_learning_page.dart
       widgets/
         course_card.dart
 ```
@@ -191,13 +192,15 @@ Current meaning:
 - `course_list_page.dart`: list screen rendered from BLoC state, with no direct data-source call.
 - `course_detail_page.dart`: detail screen loaded by course id and enrolls through BLoC.
 - `my_learning_page.dart`: my courses screen with local progress updates.
-- `course_detail_page.dart`: detail screen still receives `Course` directly and will be refactored in later milestones.
 - `course_card.dart`: UI widget for displaying a course.
+- `docs/architecture-checklist.md`: checklist for boundaries, state, error flow, and naming.
+- `docs/adr/0001-feature-first-clean-architecture.md`: short ADR for the architecture decision.
 - `docs/architecture/m2-domain-modeling.md`: entity/use case diagram for milestone 2.
 - `docs/architecture/m3-data-mock.md`: data source/mapper/repository diagram for milestone 3.
 - `docs/architecture/m4-course-list-bloc.md`: event/state diagram for milestone 4.
 - `docs/architecture/m5-course-detail-enrollment.md`: detail/enrollment flow diagram for milestone 5.
 - `docs/architecture/m6-my-learning-progress.md`: My Learning/progress diagram for milestone 6.
+- `docs/architecture/m7-refactor-review.md`: review/refactor summary for milestone 7.
 
 Later milestones can evolve this into a feature-first Clean Architecture structure:
 
@@ -227,15 +230,15 @@ Available tags:
 | `m4-course-list-bloc` | CourseListBloc, event/state, UI rendering from state | Available |
 | `m5-course-detail-enrollment` | Course detail BLoC, `GetCourseDetail`, `EnrollCourse` | Available |
 | `m6-my-learning-progress` | My Learning screen, `GetMyCourses`, `UpdateLessonProgress` | Available |
+| `m7-refactor-review` | Architecture checklist, boundary review, ADR | Available |
 
 Planned tags for later modules:
 
 | Tag | Goal |
 |---|---|
-| `m7-refactor-review` | Refactor, boundary review, production checklist |
 | `m8-ai-workflow` | AI-assisted review/refactor workflow |
 
-Note: `m0-setup` marks the initial runnable Flutter project. `m1-naive-course-list` marks the naive version with a static course list, course card, and detail navigation as refactoring material. `m2-domain-modeling` starts separating the domain layer. `m3-data-mock` adds the mock data layer. `m4-course-list-bloc` moves Course List to BLoC event/state. `m5-course-detail-enrollment` moves Course Detail and enrollment flow to BLoC/use cases. `m6-my-learning-progress` adds My Learning and local mock progress with Cubit.
+Note: `m0-setup` marks the initial runnable Flutter project. `m1-naive-course-list` marks the naive version with a static course list, course card, and detail navigation as refactoring material. `m2-domain-modeling` starts separating the domain layer. `m3-data-mock` adds the mock data layer. `m4-course-list-bloc` moves Course List to BLoC event/state. `m5-course-detail-enrollment` moves Course Detail and enrollment flow to BLoC/use cases. `m6-my-learning-progress` adds My Learning and local mock progress with Cubit. `m7-refactor-review` adds the review checklist, structure cleanup, and ADR.
 
 ## Checkout a tag for learning
 

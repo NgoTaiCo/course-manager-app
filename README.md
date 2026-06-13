@@ -155,6 +155,7 @@ lib/
       pages/
         course_list_page.dart
         course_detail_page.dart
+        my_learning_page.dart
       widgets/
         course_card.dart
 ```
@@ -189,13 +190,15 @@ lib/
 - `course_list_page.dart`: màn hình list render theo BLoC state, không gọi data source trực tiếp.
 - `course_detail_page.dart`: màn hình detail load theo course id và enroll qua BLoC.
 - `my_learning_page.dart`: màn hình khóa học của tôi và cập nhật progress local.
-- `course_detail_page.dart`: màn hình detail vẫn nhận trực tiếp `Course`, sẽ còn refactor ở các milestone sau.
 - `course_card.dart`: widget hiển thị course.
+- `docs/architecture-checklist.md`: checklist review boundary, state, error flow và naming.
+- `docs/adr/0001-feature-first-clean-architecture.md`: ADR ngắn cho quyết định kiến trúc.
 - `docs/architecture/m2-domain-modeling.md`: sơ đồ entity/use case cho milestone 2.
 - `docs/architecture/m3-data-mock.md`: sơ đồ data source/mapper/repository cho milestone 3.
 - `docs/architecture/m4-course-list-bloc.md`: sơ đồ event/state cho milestone 4.
 - `docs/architecture/m5-course-detail-enrollment.md`: sơ đồ detail/enrollment flow cho milestone 5.
 - `docs/architecture/m6-my-learning-progress.md`: sơ đồ My Learning/progress cho milestone 6.
+- `docs/architecture/m7-refactor-review.md`: tổng kết review/refactor cho milestone 7.
 
 Các milestone sau có thể mở rộng sang cấu trúc feature-first Clean Architecture:
 
@@ -225,15 +228,15 @@ Các tag hiện có:
 | `m4-course-list-bloc` | CourseListBloc, event/state, UI render theo state | Có sẵn |
 | `m5-course-detail-enrollment` | Course detail BLoC, `GetCourseDetail`, `EnrollCourse` | Có sẵn |
 | `m6-my-learning-progress` | My Learning screen, `GetMyCourses`, `UpdateLessonProgress` | Có sẵn |
+| `m7-refactor-review` | Architecture checklist, boundary review, ADR | Có sẵn |
 
 Các tag dự kiến cho những module tiếp theo:
 
 | Tag | Mục tiêu |
 |---|---|
-| `m7-refactor-review` | Refactor, review boundary, production checklist |
 | `m8-ai-workflow` | AI-assisted review/refactor workflow |
 
-Lưu ý: `m0-setup` đánh dấu project Flutter chạy được ban đầu. `m1-naive-course-list` đánh dấu phiên bản naive có static course list, course card và navigation sang detail để làm chất liệu refactor. `m2-domain-modeling` bắt đầu tách domain layer. `m3-data-mock` thêm data layer mock. `m4-course-list-bloc` đưa Course List sang event/state BLoC. `m5-course-detail-enrollment` đưa Course Detail và enroll flow sang BLoC/use case. `m6-my-learning-progress` thêm My Learning và progress local mock bằng Cubit.
+Lưu ý: `m0-setup` đánh dấu project Flutter chạy được ban đầu. `m1-naive-course-list` đánh dấu phiên bản naive có static course list, course card và navigation sang detail để làm chất liệu refactor. `m2-domain-modeling` bắt đầu tách domain layer. `m3-data-mock` thêm data layer mock. `m4-course-list-bloc` đưa Course List sang event/state BLoC. `m5-course-detail-enrollment` đưa Course Detail và enroll flow sang BLoC/use case. `m6-my-learning-progress` thêm My Learning và progress local mock bằng Cubit. `m7-refactor-review` bổ sung checklist review, dọn tài liệu cấu trúc và ADR.
 
 ## Checkout một tag để học
 
