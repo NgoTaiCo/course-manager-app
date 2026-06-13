@@ -1,5 +1,7 @@
 import 'course.dart';
+import 'data/datasources/mock_enrollment_data_source.dart';
 import 'data/datasources/mock_course_data_source.dart';
+import 'data/repositories/mock_enrollment_repository.dart';
 import 'data/repositories/mock_course_repository.dart';
 
 /// Nơi lắp dependency tạm cho feature course.
@@ -17,4 +19,31 @@ CourseListBloc createCourseListBloc({
   final getCourses = GetCourses(repository);
 
   return CourseListBloc(getCourses: getCourses);
+}
+
+/// Tạo CourseDetailBloc với dependency mock.
+///
+/// [shouldFailEnrollment] có thể đổi thành true để demo trạng thái enroll lỗi.
+CourseDetailBloc createCourseDetailBloc({
+  bool shouldFailCourseDetail = false,
+  bool shouldFailEnrollment = false,
+}) {
+  final courseDataSource = MockCourseDataSource(
+    shouldFail: shouldFailCourseDetail,
+  );
+  final courseRepository = MockCourseRepository(courseDataSource);
+  final getCourseDetail = GetCourseDetail(courseRepository);
+
+  final enrollmentDataSource = MockEnrollmentDataSource(
+    shouldFail: shouldFailEnrollment,
+  );
+  final enrollmentRepository = MockEnrollmentRepository(enrollmentDataSource);
+  final enrollCourse = EnrollCourse(enrollmentRepository);
+
+  return CourseDetailBloc(
+    getCourseDetail: getCourseDetail,
+    enrollCourse: enrollCourse,
+    // User giả lập cho A01. Auth thật nằm ngoài phạm vi milestone này.
+    currentUserId: 'learner_01',
+  );
 }

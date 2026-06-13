@@ -141,7 +141,7 @@ class _CourseListBody extends StatelessWidget {
               onTap: () => Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (_) => CourseDetailPage(course: course),
+                  builder: (_) => CourseDetailPage(courseId: course.id),
                 ),
               ),
             );
