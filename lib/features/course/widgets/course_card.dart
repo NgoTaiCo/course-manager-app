@@ -3,8 +3,13 @@ import '../course.dart';
 
 /// Widget hiển thị một khóa học dạng card — naive approach.
 ///
-/// Logic hiển thị status đang nằm trực tiếp trong Widget bằng if/else,
-/// dùng String thay vì enum → dễ lỗi nếu typo.
+/// Logic hiển thị status vẫn đang nằm trực tiếp trong Widget.
+/// M2 đã có enum/domain entity, nhưng presentation mapping sẽ còn refactor tiếp.
+///
+/// Điểm cần quan sát:
+/// - Card nhận trực tiếp [Course].
+/// - Format giá và label level vẫn nằm trong Widget.
+/// - Khi nhiều màn hình cần format giống nhau, code này sẽ bắt đầu lặp.
 class CourseCard extends StatelessWidget {
   final Course course;
   final VoidCallback? onTap;
@@ -24,7 +29,7 @@ class CourseCard extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Status + Category
+              // Trạng thái + danh mục: UI tự quyết định cách hiển thị status.
               Row(
                 children: [
                   _StatusChip(status: course.status),
@@ -42,7 +47,7 @@ class CourseCard extends StatelessWidget {
               ),
               const SizedBox(height: 8),
 
-              // Title
+              // Tiêu đề khóa học.
               Text(
                 course.title,
                 style: theme.textTheme.titleMedium
@@ -52,7 +57,7 @@ class CourseCard extends StatelessWidget {
               ),
               const SizedBox(height: 4),
 
-              // Instructor
+              // Tên giảng viên.
               Text(
                 course.instructorName,
                 style: theme.textTheme.bodySmall?.copyWith(
@@ -61,7 +66,7 @@ class CourseCard extends StatelessWidget {
               ),
               const SizedBox(height: 10),
 
-              // Meta: rating, duration, level
+              // Metadata cơ bản: rating, thời lượng, level.
               Row(
                 children: [
                   if (course.rating > 0) ...[
@@ -93,7 +98,7 @@ class CourseCard extends StatelessWidget {
               ),
               const SizedBox(height: 10),
 
-              // Price
+              // Giá và giảm giá vẫn format trực tiếp trong Widget.
               Row(
                 children: [
                   Text(
@@ -128,14 +133,18 @@ class CourseCard extends StatelessWidget {
     );
   }
 
-  String _levelLabel(String level) {
-    if (level == 'beginner') return 'Cơ bản';
-    if (level == 'intermediate') return 'Trung cấp';
-    if (level == 'advanced') return 'Nâng cao';
-    return level;
+  String _levelLabel(CourseLevel level) {
+    // Ánh xạ enum sang label tiếng Việt đang nằm ở presentation.
+    // Nếu nhiều nơi cần dùng, nên tách để tránh lặp.
+    return switch (level) {
+      CourseLevel.beginner => 'Cơ bản',
+      CourseLevel.intermediate => 'Trung cấp',
+      CourseLevel.advanced => 'Nâng cao',
+    };
   }
 
   String _formatPrice(double price) {
+    // Bộ định dạng tạm cho M2. Sau này có thể tách thành helper/presenter.
     return price.toInt().toString().replaceAllMapped(
           RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
           (m) => '${m[1]}.',
@@ -144,28 +153,18 @@ class CourseCard extends StatelessWidget {
 }
 
 class _StatusChip extends StatelessWidget {
-  final String status;
+  final CourseStatus status;
   const _StatusChip({required this.status});
 
   @override
   Widget build(BuildContext context) {
-    // Naive: so sánh String thủ công — dễ lỗi nếu typo
-    final Color color;
-    final String label;
-
-    if (status == 'published') {
-      color = Colors.green;
-      label = 'Đang mở';
-    } else if (status == 'draft') {
-      color = Colors.orange;
-      label = 'Bản nháp';
-    } else if (status == 'archived') {
-      color = Colors.grey;
-      label = 'Lưu trữ';
-    } else {
-      color = Colors.grey;
-      label = status;
-    }
+    // Logic presentation: map trạng thái domain sang màu và label hiển thị.
+    // Milestone sau có thể đưa logic này ra mapper nếu bị lặp.
+    final (color, label) = switch (status) {
+      CourseStatus.published => (Colors.green, 'Đang mở'),
+      CourseStatus.draft => (Colors.orange, 'Bản nháp'),
+      CourseStatus.archived => (Colors.grey, 'Lưu trữ'),
+    };
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),

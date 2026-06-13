@@ -6,6 +6,10 @@ import '../course.dart';
 /// Nhận trực tiếp object [Course] qua constructor — không có
 /// route argument, không có ID-based navigation. Nếu sau này muốn
 /// deep link vào màn hình này từ notification thì cần refactor.
+///
+/// Sau M2, [Course] đã là domain entity, nhưng màn hình này vẫn dùng entity
+/// trực tiếp. Đây là điểm cố ý giữ lại để các milestone sau thảo luận:
+/// presentation nên nhận entity, view model, hay state từ BLoC?
 class CourseDetailPage extends StatelessWidget {
   final Course course;
 
@@ -24,7 +28,7 @@ class CourseDetailPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Thumbnail placeholder
+            // Ảnh đại diện tạm: chưa có image field hoặc media data thật.
             AspectRatio(
               aspectRatio: 16 / 9,
               child: Container(
@@ -42,7 +46,7 @@ class CourseDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Category + Status
+            // Category + status vẫn được map trực tiếp trong UI.
             Row(
               children: [
                 Chip(
@@ -56,7 +60,7 @@ class CourseDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
 
-            // Title
+            // Tiêu đề khóa học.
             Text(
               course.title,
               style: theme.textTheme.headlineSmall
@@ -64,7 +68,7 @@ class CourseDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 8),
 
-            // Instructor
+            // Giảng viên phụ trách khóa học.
             Row(
               children: [
                 const Icon(Icons.person_outline, size: 16),
@@ -80,15 +84,15 @@ class CourseDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // Stats row
+            // Các chỉ số hiển thị lấy trực tiếp từ entity.
             _buildStatsRow(theme),
             const SizedBox(height: 20),
 
-            // Price section
+            // Khu vực giá vẫn format trong UI, chưa tách presenter/formatter.
             _buildPriceSection(theme),
             const SizedBox(height: 20),
 
-            // Description
+            // Mô tả khóa học.
             Text(
               'Mô tả khóa học',
               style: theme.textTheme.titleMedium
@@ -101,7 +105,7 @@ class CourseDetailPage extends StatelessWidget {
             ),
             const SizedBox(height: 20),
 
-            // Tags
+            // Tags đang hiển thị trực tiếp từ List<String>.
             if (course.tags.isNotEmpty) ...[
               Text(
                 'Tags',
@@ -123,13 +127,14 @@ class CourseDetailPage extends StatelessWidget {
               const SizedBox(height: 24),
             ],
 
-            // Enroll button
+            // Nút đăng ký vẫn xử lý side effect bằng SnackBar ngay trong UI.
             SizedBox(
               width: double.infinity,
               child: FilledButton(
-                onPressed: course.status == 'published'
+                onPressed: course.canEnroll
                     ? () {
-                        // logic enroll viết thẳng vào callback
+                        // Logic enroll vẫn viết thẳng vào callback.
+                        // M5 sẽ tách thành use case/state rõ ràng hơn.
                         ScaffoldMessenger.of(context).showSnackBar(
                           SnackBar(
                             content: Text(
@@ -139,11 +144,11 @@ class CourseDetailPage extends StatelessWidget {
                       }
                     : null,
                 child: Text(
-                  course.status == 'published'
-                      ? 'Đăng ký ngay'
-                      : course.status == 'draft'
-                          ? 'Chưa mở đăng ký'
-                          : 'Không còn hoạt động',
+                  switch (course.status) {
+                    CourseStatus.published => 'Đăng ký ngay',
+                    CourseStatus.draft => 'Chưa mở đăng ký',
+                    CourseStatus.archived => 'Không còn hoạt động',
+                  },
                 ),
               ),
             ),
@@ -235,24 +240,18 @@ class CourseDetailPage extends StatelessWidget {
 }
 
 class _StatusBadge extends StatelessWidget {
-  final String status;
+  final CourseStatus status;
   const _StatusBadge({required this.status});
 
   @override
   Widget build(BuildContext context) {
-    final Color color;
-    final String label;
-
-    if (status == 'published') {
-      color = Colors.green;
-      label = 'Đang mở';
-    } else if (status == 'draft') {
-      color = Colors.orange;
-      label = 'Bản nháp';
-    } else {
-      color = Colors.grey;
-      label = 'Lưu trữ';
-    }
+    // Mapping status sang màu/label vẫn nằm ở presentation.
+    // Sau này có thể tách thành mapper hoặc extension nếu lặp lại nhiều nơi.
+    final (color, label) = switch (status) {
+      CourseStatus.published => (Colors.green, 'Đang mở'),
+      CourseStatus.draft => (Colors.orange, 'Bản nháp'),
+      CourseStatus.archived => (Colors.grey, 'Lưu trữ'),
+    };
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -280,6 +279,7 @@ class _StatItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Widget nhỏ phục vụ layout, chưa chứa business logic.
     final theme = Theme.of(context);
     final c = color ?? theme.colorScheme.onSurfaceVariant;
 

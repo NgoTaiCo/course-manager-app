@@ -110,6 +110,16 @@ lib/
     course/
       course.dart
       course_data.dart
+      domain/
+        entities/
+          course.dart
+          lesson.dart
+          enrollment.dart
+          user_progress.dart
+        repositories/
+          course_repository.dart
+        usecases/
+          get_courses.dart
       pages/
         course_list_page.dart
         course_detail_page.dart
@@ -119,11 +129,15 @@ lib/
 
 Ý nghĩa hiện tại:
 
-- `course.dart`: model đang đơn giản hóa, chưa tách entity/DTO.
-- `course_data.dart`: mock data local.
+- `course.dart`: barrel export cho domain API của feature course.
+- `course_data.dart`: mock data local tạm thời, phần data layer thật sẽ tách ở `m3-data-mock`.
+- `domain/entities/`: domain entities không import Flutter hoặc data package.
+- `domain/repositories/course_repository.dart`: repository contract.
+- `domain/usecases/get_courses.dart`: use case đầu tiên.
 - `course_list_page.dart`: màn hình list naive, còn chứa filter logic trong Widget.
-- `course_detail_page.dart`: màn hình detail dùng trực tiếp model hiện tại.
+- `course_detail_page.dart`: màn hình detail vẫn nhận trực tiếp `Course`, sẽ còn refactor ở các milestone sau.
 - `course_card.dart`: widget hiển thị course.
+- `docs/architecture/m2-domain-modeling.md`: sơ đồ entity/use case cho milestone 2.
 
 Các milestone sau có thể mở rộng sang cấu trúc feature-first Clean Architecture:
 
@@ -148,12 +162,12 @@ Các tag hiện có:
 |---|---|---|
 | `m0-setup` | Setup project, app chạy được | Có sẵn |
 | `m1-naive-course-list` | Naive Course List để demo vấn đề | Có sẵn |
+| `m2-domain-modeling` | Domain entities, repository contract, `GetCourses` use case | Có sẵn |
 
 Các tag dự kiến cho những module tiếp theo:
 
 | Tag | Mục tiêu |
 |---|---|
-| `m2-domain-modeling` | Tách domain entity, repository contract |
 | `m3-data-mock` | Mock data source, repository implementation, mapper |
 | `m4-course-list-bloc` | CourseListBloc, event/state, UI render theo state |
 | `m5-course-detail-enrollment` | Detail flow, enrollment use case |
@@ -161,7 +175,7 @@ Các tag dự kiến cho những module tiếp theo:
 | `m7-refactor-review` | Refactor, review boundary, production checklist |
 | `m8-ai-workflow` | AI-assisted review/refactor workflow |
 
-Lưu ý: hiện tại `m0-setup` và `m1-naive-course-list` cùng trỏ về commit đầu tiên sau khi làm sạch history. Từ các module sau, mỗi tag nên trỏ tới commit milestone riêng.
+Lưu ý: `m0-setup` đánh dấu project Flutter chạy được ban đầu. `m1-naive-course-list` đánh dấu phiên bản naive có static course list, course card và navigation sang detail để làm chất liệu refactor. `m2-domain-modeling` bắt đầu tách domain layer nhưng vẫn chưa tạo data implementation; phần đó dành cho `m3-data-mock`.
 
 ## Checkout một tag để học
 

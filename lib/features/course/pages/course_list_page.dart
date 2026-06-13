@@ -21,7 +21,7 @@ class CourseListPage extends StatefulWidget {
 
 class _CourseListPageState extends State<CourseListPage> {
   // Filter state nằm thẳng trong Widget
-  String? _selectedStatus; // null = Tất cả
+  CourseStatus? _selectedStatus; // null = Tất cả
 
   List<Course> get _filteredCourses {
     // Logic lọc viết thẳng trong Widget
@@ -55,9 +55,9 @@ class _CourseListPageState extends State<CourseListPage> {
   Widget _buildFilterChips() {
     final filters = [
       (null, 'Tất cả'),
-      ('published', 'Đang mở'),
-      ('draft', 'Bản nháp'),
-      ('archived', 'Lưu trữ'),
+      (CourseStatus.published, 'Đang mở'),
+      (CourseStatus.draft, 'Bản nháp'),
+      (CourseStatus.archived, 'Lưu trữ'),
     ];
 
     return SizedBox(

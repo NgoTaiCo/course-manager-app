@@ -112,6 +112,16 @@ lib/
     course/
       course.dart
       course_data.dart
+      domain/
+        entities/
+          course.dart
+          lesson.dart
+          enrollment.dart
+          user_progress.dart
+        repositories/
+          course_repository.dart
+        usecases/
+          get_courses.dart
       pages/
         course_list_page.dart
         course_detail_page.dart
@@ -121,11 +131,15 @@ lib/
 
 Current meaning:
 
-- `course.dart`: simplified model, not yet separated into entity/DTO.
-- `course_data.dart`: local mock data.
+- `course.dart`: barrel export for the course feature domain API.
+- `course_data.dart`: temporary local mock data; the real data layer is left for `m3-data-mock`.
+- `domain/entities/`: domain entities with no Flutter or data-package imports.
+- `domain/repositories/course_repository.dart`: repository contract.
+- `domain/usecases/get_courses.dart`: first use case.
 - `course_list_page.dart`: naive list screen with filter logic still inside the Widget.
-- `course_detail_page.dart`: detail screen using the current model directly.
+- `course_detail_page.dart`: detail screen still receives `Course` directly and will be refactored in later milestones.
 - `course_card.dart`: UI widget for displaying a course.
+- `docs/architecture/m2-domain-modeling.md`: entity/use case diagram for milestone 2.
 
 Later milestones can evolve this into a feature-first Clean Architecture structure:
 
@@ -150,12 +164,12 @@ Available tags:
 |---|---|---|
 | `m0-setup` | Project setup, runnable app | Available |
 | `m1-naive-course-list` | Naive Course List used to demonstrate problems | Available |
+| `m2-domain-modeling` | Domain entities, repository contract, `GetCourses` use case | Available |
 
 Planned tags for later modules:
 
 | Tag | Goal |
 |---|---|
-| `m2-domain-modeling` | Separate domain entity and repository contract |
 | `m3-data-mock` | Mock data source, repository implementation, mapper |
 | `m4-course-list-bloc` | CourseListBloc, event/state, UI rendering from state |
 | `m5-course-detail-enrollment` | Detail flow and enrollment use case |
@@ -163,7 +177,7 @@ Planned tags for later modules:
 | `m7-refactor-review` | Refactor, boundary review, production checklist |
 | `m8-ai-workflow` | AI-assisted review/refactor workflow |
 
-Note: `m0-setup` and `m1-naive-course-list` currently point to the same first clean commit. From later modules onward, each tag should point to its own milestone commit.
+Note: `m0-setup` marks the initial runnable Flutter project. `m1-naive-course-list` marks the naive version with a static course list, course card, and detail navigation as refactoring material. `m2-domain-modeling` starts separating the domain layer but does not create a data implementation yet; that belongs to `m3-data-mock`.
 
 ## Checkout a tag for learning
 
