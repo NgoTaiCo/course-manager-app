@@ -1,21 +1,24 @@
-import 'course.dart';
+import 'data/models/course_model.dart';
 
-/// Dữ liệu khóa học hardcode — naive approach.
+/// Dữ liệu khóa học hardcode ở data layer — mock approach.
 ///
-/// Vấn đề sẽ thấy rõ khi mở rộng:
-/// - Muốn đổi sang API thì phải sửa tất cả Widget đang gọi [allCourses].
-/// - Không có cách test logic fetch mà không render Widget.
-/// - Filter/search sẽ viết thẳng trong Widget, code càng ngày càng phình.
-const List<Course> allCourses = [
-  Course(
+/// Sau M3, file này không trả về domain entity trực tiếp nữa.
+/// Nó trả về `CourseModel` để giả lập dữ liệu thô từ API/local database.
+///
+/// Vấn đề cần quan sát:
+/// - `status` và `level` vẫn là String giống dữ liệu ngoài hệ thống.
+/// - Mapper sẽ chuyển các String này sang enum của domain.
+/// - Nếu sau này đổi sang API thật, UI/domain không nên phải sửa theo.
+const List<CourseModel> mockCourseModels = [
+  CourseModel(
     id: 'crs_01',
     title: 'Flutter & Dart: Xây dựng ứng dụng từ A-Z',
     description:
         'Khóa học toàn diện về Flutter và Dart dành cho người mới bắt đầu. Bạn sẽ xây dựng 5 ứng dụng thực tế và nắm vững kiến trúc BLoC.',
     instructorName: 'Nguyễn Minh Khoa',
     categoryName: 'Lập trình',
-    status: CourseStatus.published,
-    level: CourseLevel.beginner,
+    status: 'published',
+    level: 'beginner',
     price: 499000,
     originalPrice: 999000,
     rating: 4.8,
@@ -25,15 +28,15 @@ const List<Course> allCourses = [
     lessonCount: 96,
     tags: ['flutter', 'dart', 'mobile', 'bloc'],
   ),
-  Course(
+  CourseModel(
     id: 'crs_02',
     title: 'Clean Architecture trong Flutter',
     description:
         'Học cách tổ chức code Flutter theo Clean Architecture, áp dụng SOLID principles và viết unit test chuyên nghiệp.',
     instructorName: 'Nguyễn Minh Khoa',
     categoryName: 'Lập trình',
-    status: CourseStatus.published,
-    level: CourseLevel.advanced,
+    status: 'published',
+    level: 'advanced',
     price: 699000,
     originalPrice: 1299000,
     rating: 4.9,
@@ -43,15 +46,15 @@ const List<Course> allCourses = [
     lessonCount: 72,
     tags: ['flutter', 'clean-architecture', 'solid', 'testing'],
   ),
-  Course(
+  CourseModel(
     id: 'crs_03',
     title: 'Python cho Data Science',
     description:
         'Từ cơ bản Python đến phân tích dữ liệu với Pandas, NumPy, Matplotlib và Scikit-learn.',
     instructorName: 'Nguyễn Minh Khoa',
     categoryName: 'Khoa học dữ liệu',
-    status: CourseStatus.published,
-    level: CourseLevel.intermediate,
+    status: 'published',
+    level: 'intermediate',
     price: 599000,
     originalPrice: 1099000,
     rating: 4.7,
@@ -61,15 +64,15 @@ const List<Course> allCourses = [
     lessonCount: 88,
     tags: ['python', 'data-science', 'pandas', 'machine-learning'],
   ),
-  Course(
+  CourseModel(
     id: 'crs_04',
     title: 'UI/UX Design Fundamentals',
     description:
         'Nắm vững nguyên lý thiết kế, quy trình Design Thinking và sử dụng Figma để tạo ra sản phẩm thực tế.',
     instructorName: 'Trần Thị Lan Anh',
     categoryName: 'Thiết kế UI/UX',
-    status: CourseStatus.published,
-    level: CourseLevel.beginner,
+    status: 'published',
+    level: 'beginner',
     price: 549000,
     originalPrice: 999000,
     rating: 4.9,
@@ -79,15 +82,15 @@ const List<Course> allCourses = [
     lessonCount: 64,
     tags: ['ui-ux', 'figma', 'design-thinking', 'prototyping'],
   ),
-  Course(
+  CourseModel(
     id: 'crs_05',
     title: 'Advanced Figma: Design System & Components',
     description:
         'Khóa học nâng cao về Figma, xây dựng design system quy mô lớn, quản lý component library.',
     instructorName: 'Trần Thị Lan Anh',
     categoryName: 'Thiết kế UI/UX',
-    status: CourseStatus.published,
-    level: CourseLevel.advanced,
+    status: 'published',
+    level: 'advanced',
     price: 799000,
     originalPrice: 1499000,
     rating: 4.8,
@@ -97,15 +100,15 @@ const List<Course> allCourses = [
     lessonCount: 48,
     tags: ['figma', 'design-system', 'components'],
   ),
-  Course(
+  CourseModel(
     id: 'crs_06',
     title: 'Machine Learning với TensorFlow',
     description:
         'Hiểu sâu về các thuật toán ML và triển khai mô hình với TensorFlow 2.x và Keras.',
     instructorName: 'Nguyễn Minh Khoa',
     categoryName: 'Khoa học dữ liệu',
-    status: CourseStatus.published,
-    level: CourseLevel.advanced,
+    status: 'published',
+    level: 'advanced',
     price: 899000,
     originalPrice: 1699000,
     rating: 4.6,
@@ -115,15 +118,15 @@ const List<Course> allCourses = [
     lessonCount: 104,
     tags: ['machine-learning', 'tensorflow', 'keras', 'deep-learning'],
   ),
-  Course(
+  CourseModel(
     id: 'crs_07',
     title: 'Khởi nghiệp từ 0: Từ ý tưởng đến sản phẩm',
     description:
         'Hướng dẫn thực tiễn để biến ý tưởng kinh doanh thành sản phẩm MVP và thu hút đầu tư.',
     instructorName: 'Lê Hoàng Phúc',
     categoryName: 'Kinh doanh',
-    status: CourseStatus.published,
-    level: CourseLevel.beginner,
+    status: 'published',
+    level: 'beginner',
     price: 449000,
     originalPrice: 799000,
     rating: 4.7,
@@ -133,15 +136,15 @@ const List<Course> allCourses = [
     lessonCount: 56,
     tags: ['startup', 'mvp', 'business-model', 'fundraising'],
   ),
-  Course(
+  CourseModel(
     id: 'crs_08',
     title: 'Digital Marketing toàn diện',
     description:
         'Chiến lược marketing số bao gồm SEO, Google Ads, Facebook Ads, Email Marketing và Content Marketing.',
     instructorName: 'Lê Hoàng Phúc',
     categoryName: 'Kinh doanh',
-    status: CourseStatus.published,
-    level: CourseLevel.intermediate,
+    status: 'published',
+    level: 'intermediate',
     price: 599000,
     originalPrice: 1199000,
     rating: 4.5,
@@ -151,15 +154,15 @@ const List<Course> allCourses = [
     lessonCount: 80,
     tags: ['digital-marketing', 'seo', 'google-ads', 'facebook-ads'],
   ),
-  Course(
+  CourseModel(
     id: 'crs_09',
     title: 'Node.js & Express: REST API từ A-Z',
     description:
         'Xây dựng REST API mạnh mẽ với Node.js, Express, MongoDB và triển khai lên cloud.',
     instructorName: 'Nguyễn Minh Khoa',
     categoryName: 'Lập trình',
-    status: CourseStatus.published,
-    level: CourseLevel.intermediate,
+    status: 'published',
+    level: 'intermediate',
     price: 549000,
     originalPrice: 999000,
     rating: 4.7,
@@ -169,15 +172,15 @@ const List<Course> allCourses = [
     lessonCount: 72,
     tags: ['nodejs', 'express', 'mongodb', 'rest-api'],
   ),
-  Course(
+  CourseModel(
     id: 'crs_10',
     title: 'React Native: Ứng dụng đa nền tảng',
     description:
         'Phát triển ứng dụng iOS và Android với React Native và Expo. Từ cơ bản đến publish lên store.',
     instructorName: 'Nguyễn Minh Khoa',
     categoryName: 'Lập trình',
-    status: CourseStatus.draft,
-    level: CourseLevel.intermediate,
+    status: 'draft',
+    level: 'intermediate',
     price: 649000,
     originalPrice: 1299000,
     rating: 0,
@@ -187,15 +190,15 @@ const List<Course> allCourses = [
     lessonCount: 80,
     tags: ['react-native', 'expo', 'mobile', 'ios', 'android'],
   ),
-  Course(
+  CourseModel(
     id: 'crs_11',
     title: 'Figma to Flutter: Chuyển đổi thiết kế thành code',
     description:
         'Khóa học kết hợp giữa design và development, học cách chuyển đổi thiết kế Figma thành ứng dụng Flutter.',
     instructorName: 'Trần Thị Lan Anh',
     categoryName: 'Thiết kế UI/UX',
-    status: CourseStatus.draft,
-    level: CourseLevel.intermediate,
+    status: 'draft',
+    level: 'intermediate',
     price: 749000,
     originalPrice: 1399000,
     rating: 0,
@@ -205,15 +208,15 @@ const List<Course> allCourses = [
     lessonCount: 60,
     tags: ['figma', 'flutter', 'design-to-code'],
   ),
-  Course(
+  CourseModel(
     id: 'crs_12',
     title: 'Tư duy dữ liệu với SQL & Power BI',
     description:
         'Học SQL từ cơ bản đến nâng cao, kết hợp Power BI để tạo dashboard báo cáo kinh doanh chuyên nghiệp.',
     instructorName: 'Nguyễn Minh Khoa',
     categoryName: 'Khoa học dữ liệu',
-    status: CourseStatus.draft,
-    level: CourseLevel.beginner,
+    status: 'draft',
+    level: 'beginner',
     price: 499000,
     originalPrice: 899000,
     rating: 0,
@@ -223,15 +226,15 @@ const List<Course> allCourses = [
     lessonCount: 72,
     tags: ['sql', 'power-bi', 'data-analysis'],
   ),
-  Course(
+  CourseModel(
     id: 'crs_13',
     title: 'Kỹ năng thuyết trình & giao tiếp chuyên nghiệp',
     description:
         'Phát triển kỹ năng thuyết trình trước đám đông, kỹ năng giao tiếp trong môi trường công sở và kỹ năng đàm phán.',
     instructorName: 'Lê Hoàng Phúc',
     categoryName: 'Phát triển cá nhân',
-    status: CourseStatus.published,
-    level: CourseLevel.beginner,
+    status: 'published',
+    level: 'beginner',
     price: 349000,
     originalPrice: 699000,
     rating: 4.6,
@@ -241,15 +244,15 @@ const List<Course> allCourses = [
     lessonCount: 40,
     tags: ['soft-skills', 'presentation', 'communication'],
   ),
-  Course(
+  CourseModel(
     id: 'crs_14',
     title: 'iOS Development với Swift & SwiftUI',
     description:
         'Phát triển ứng dụng iOS native với Swift và SwiftUI. Khóa học này đã bị ngừng cập nhật.',
     instructorName: 'Nguyễn Minh Khoa',
     categoryName: 'Lập trình',
-    status: CourseStatus.archived,
-    level: CourseLevel.intermediate,
+    status: 'archived',
+    level: 'intermediate',
     price: 599000,
     originalPrice: 999000,
     rating: 4.3,
@@ -259,15 +262,15 @@ const List<Course> allCourses = [
     lessonCount: 80,
     tags: ['ios', 'swift', 'swiftui', 'apple'],
   ),
-  Course(
+  CourseModel(
     id: 'crs_15',
     title: 'WordPress cơ bản: Tạo website không cần code',
     description:
         'Xây dựng website chuyên nghiệp với WordPress, Elementor và WooCommerce. Khóa học cũ, nội dung lỗi thời.',
     instructorName: 'Lê Hoàng Phúc',
     categoryName: 'Lập trình',
-    status: CourseStatus.archived,
-    level: CourseLevel.beginner,
+    status: 'archived',
+    level: 'beginner',
     price: 299000,
     originalPrice: 599000,
     rating: 4.1,
@@ -277,15 +280,15 @@ const List<Course> allCourses = [
     lessonCount: 48,
     tags: ['wordpress', 'elementor', 'woocommerce', 'no-code'],
   ),
-  Course(
+  CourseModel(
     id: 'crs_16',
     title: 'Quản lý dự án theo Agile & Scrum',
     description:
         'Nắm vững phương pháp Agile và Scrum để quản lý dự án phần mềm hiệu quả.',
     instructorName: 'Lê Hoàng Phúc',
     categoryName: 'Kinh doanh',
-    status: CourseStatus.archived,
-    level: CourseLevel.intermediate,
+    status: 'archived',
+    level: 'intermediate',
     price: 499000,
     originalPrice: 999000,
     rating: 4.4,

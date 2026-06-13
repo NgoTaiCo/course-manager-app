@@ -1,17 +1,23 @@
 import 'package:flutter/material.dart';
 import '../course.dart';
-import '../course_data.dart';
+import '../data/datasources/mock_course_data_source.dart';
+import '../data/repositories/mock_course_repository.dart';
 import '../widgets/course_card.dart';
 import 'course_detail_page.dart';
 
-/// Màn hình danh sách khóa học — naive approach.
+/// Màn hình danh sách khóa học.
 ///
-/// Những vấn đề sẽ thấy rõ khi mở rộng:
-/// 1. Logic lọc ([_selectedStatus]) nằm thẳng trong Widget.
-/// 2. [allCourses] được truy cập trực tiếp — đổi sang API thì phải sửa
-///    file này.
-/// 3. Không có loading state, không có error state.
-/// 4. Khi thêm search, favorite, pagination — Widget này sẽ phình to.
+/// Sau M3, màn hình này không đọc static list trực tiếp nữa.
+/// Luồng hiện tại:
+/// UI -> GetCourses -> CourseRepository -> MockCourseDataSource.
+///
+/// Vẫn còn điểm cố ý chưa hoàn thiện:
+/// - UI tự tạo dependency, chưa có DI.
+/// - UI dùng FutureBuilder, chưa có BLoC event/state.
+/// - Logic filter vẫn nằm trong Widget.
+///
+/// M4 sẽ thay FutureBuilder bằng CourseListBloc để biểu diễn
+/// loading/success/empty/failure rõ ràng hơn.
 class CourseListPage extends StatefulWidget {
   const CourseListPage({super.key});
 
@@ -20,13 +26,35 @@ class CourseListPage extends StatefulWidget {
 }
 
 class _CourseListPageState extends State<CourseListPage> {
+  final GetCourses _getCourses = const GetCourses(
+    MockCourseRepository(
+      MockCourseDataSource(
+        // Đổi thành true để demo lỗi loading/failure trước khi sang BLoC.
+        shouldFail: false,
+      ),
+    ),
+  );
+
   // Filter state nằm thẳng trong Widget
   CourseStatus? _selectedStatus; // null = Tất cả
+  late Future<List<Course>> _coursesFuture;
 
-  List<Course> get _filteredCourses {
+  @override
+  void initState() {
+    super.initState();
+    _coursesFuture = _getCourses();
+  }
+
+  List<Course> _filterCourses(List<Course> courses) {
     // Logic lọc viết thẳng trong Widget
-    if (_selectedStatus == null) return allCourses;
-    return allCourses.where((c) => c.status == _selectedStatus).toList();
+    if (_selectedStatus == null) return courses;
+    return courses.where((c) => c.status == _selectedStatus).toList();
+  }
+
+  void _reloadCourses() {
+    setState(() {
+      _coursesFuture = _getCourses();
+    });
   }
 
   @override
@@ -83,30 +111,88 @@ class _CourseListPageState extends State<CourseListPage> {
   }
 
   Widget _buildCourseList() {
-    final courses = _filteredCourses;
+    return FutureBuilder<List<Course>>(
+      future: _coursesFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return const Center(child: CircularProgressIndicator());
+        }
 
-    if (courses.isEmpty) {
-      return const Center(
-        child: Text('Không có khóa học nào.'),
-      );
-    }
+        if (snapshot.hasError) {
+          return _CourseListError(
+            message: 'Không thể tải danh sách khóa học.',
+            onRetry: _reloadCourses,
+          );
+        }
 
-    return ListView.separated(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
-      itemCount: courses.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
-      itemBuilder: (context, index) {
-        final course = courses[index];
-        return CourseCard(
-          course: course,
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => CourseDetailPage(course: course),
-            ),
-          ),
+        final courses = _filterCourses(snapshot.data ?? const []);
+
+        if (courses.isEmpty) {
+          return const Center(
+            child: Text('Không có khóa học nào.'),
+          );
+        }
+
+        return ListView.separated(
+          padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),
+          itemCount: courses.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 8),
+          itemBuilder: (context, index) {
+            final course = courses[index];
+            return CourseCard(
+              course: course,
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => CourseDetailPage(course: course),
+                ),
+              ),
+            );
+          },
         );
       },
+    );
+  }
+}
+
+class _CourseListError extends StatelessWidget {
+  final String message;
+  final VoidCallback onRetry;
+
+  const _CourseListError({
+    required this.message,
+    required this.onRetry,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.error_outline,
+              size: 40,
+              color: theme.colorScheme.error,
+            ),
+            const SizedBox(height: 12),
+            Text(
+              message,
+              style: theme.textTheme.bodyMedium,
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 12),
+            FilledButton(
+              onPressed: onRetry,
+              child: const Text('Thử lại'),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
