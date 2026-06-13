@@ -116,12 +116,15 @@ lib/
         mappers/
           course_mapper.dart
           enrollment_mapper.dart
+          user_progress_mapper.dart
         models/
           course_model.dart
           enrollment_model.dart
+          user_progress_model.dart
         repositories/
           mock_course_repository.dart
           mock_enrollment_repository.dart
+          mock_learning_repository.dart
       domain/
         entities/
           course.dart
@@ -131,10 +134,13 @@ lib/
         repositories/
           course_repository.dart
           enrollment_repository.dart
+          learning_repository.dart
         usecases/
           enroll_course.dart
           get_course_detail.dart
           get_courses.dart
+          get_my_courses.dart
+          update_lesson_progress.dart
       presentation/
         bloc/
           course_list_bloc.dart
@@ -143,6 +149,9 @@ lib/
           course_detail_bloc.dart
           course_detail_event.dart
           course_detail_state.dart
+        cubit/
+          my_learning_cubit.dart
+          my_learning_state.dart
       pages/
         course_list_page.dart
         course_detail_page.dart
@@ -156,27 +165,37 @@ lib/
 - `course_data.dart`: mock data local ở dạng `CourseModel`.
 - `data/models/course_model.dart`: model dữ liệu thô của data layer.
 - `data/models/enrollment_model.dart`: model dữ liệu thô cho enrollment.
+- `data/models/user_progress_model.dart`: model dữ liệu thô cho progress.
 - `data/datasources/mock_course_data_source.dart`: mock data source có fake delay/fake error.
 - `data/datasources/mock_enrollment_data_source.dart`: mock data source cho enroll có fake failure.
+- `data/datasources/mock_learning_data_source.dart`: mock data source lưu progress local in-memory.
 - `data/mappers/course_mapper.dart`: mapper từ `CourseModel` parse từ JSON-like map sang domain `Course`.
 - `data/mappers/enrollment_mapper.dart`: mapper từ `EnrollmentModel` sang domain `Enrollment`.
+- `data/mappers/user_progress_mapper.dart`: mapper từ `UserProgressModel` sang domain `UserProgress`.
 - `data/repositories/mock_course_repository.dart`: repository implementation trả về domain entity.
 - `data/repositories/mock_enrollment_repository.dart`: repository implementation cho enrollment flow.
+- `data/repositories/mock_learning_repository.dart`: repository implementation cho My Learning/progress.
 - `domain/entities/`: domain entities không import Flutter hoặc data package.
 - `domain/repositories/course_repository.dart`: repository contract.
 - `domain/repositories/enrollment_repository.dart`: repository contract cho enroll.
+- `domain/repositories/learning_repository.dart`: repository contract cho My Learning/progress.
 - `domain/usecases/get_courses.dart`: use case đầu tiên.
 - `domain/usecases/get_course_detail.dart`: use case lấy detail theo id.
 - `domain/usecases/enroll_course.dart`: use case đăng ký khóa học.
+- `domain/usecases/get_my_courses.dart`: use case lấy khóa học của tôi.
+- `domain/usecases/update_lesson_progress.dart`: use case cập nhật progress bài học.
 - `presentation/bloc/`: CourseListBloc và CourseDetailBloc với event/state tương ứng.
+- `presentation/cubit/`: MyLearningCubit cho flow progress đơn giản.
 - `course_list_page.dart`: màn hình list render theo BLoC state, không gọi data source trực tiếp.
 - `course_detail_page.dart`: màn hình detail load theo course id và enroll qua BLoC.
+- `my_learning_page.dart`: màn hình khóa học của tôi và cập nhật progress local.
 - `course_detail_page.dart`: màn hình detail vẫn nhận trực tiếp `Course`, sẽ còn refactor ở các milestone sau.
 - `course_card.dart`: widget hiển thị course.
 - `docs/architecture/m2-domain-modeling.md`: sơ đồ entity/use case cho milestone 2.
 - `docs/architecture/m3-data-mock.md`: sơ đồ data source/mapper/repository cho milestone 3.
 - `docs/architecture/m4-course-list-bloc.md`: sơ đồ event/state cho milestone 4.
 - `docs/architecture/m5-course-detail-enrollment.md`: sơ đồ detail/enrollment flow cho milestone 5.
+- `docs/architecture/m6-my-learning-progress.md`: sơ đồ My Learning/progress cho milestone 6.
 
 Các milestone sau có thể mở rộng sang cấu trúc feature-first Clean Architecture:
 
@@ -205,16 +224,16 @@ Các tag hiện có:
 | `m3-data-mock` | Mock data source, repository implementation, mapper | Có sẵn |
 | `m4-course-list-bloc` | CourseListBloc, event/state, UI render theo state | Có sẵn |
 | `m5-course-detail-enrollment` | Course detail BLoC, `GetCourseDetail`, `EnrollCourse` | Có sẵn |
+| `m6-my-learning-progress` | My Learning screen, `GetMyCourses`, `UpdateLessonProgress` | Có sẵn |
 
 Các tag dự kiến cho những module tiếp theo:
 
 | Tag | Mục tiêu |
 |---|---|
-| `m6-my-learning-progress` | My Learning và progress flow |
 | `m7-refactor-review` | Refactor, review boundary, production checklist |
 | `m8-ai-workflow` | AI-assisted review/refactor workflow |
 
-Lưu ý: `m0-setup` đánh dấu project Flutter chạy được ban đầu. `m1-naive-course-list` đánh dấu phiên bản naive có static course list, course card và navigation sang detail để làm chất liệu refactor. `m2-domain-modeling` bắt đầu tách domain layer. `m3-data-mock` thêm data layer mock. `m4-course-list-bloc` đưa Course List sang event/state BLoC. `m5-course-detail-enrollment` đưa Course Detail và enroll flow sang BLoC/use case.
+Lưu ý: `m0-setup` đánh dấu project Flutter chạy được ban đầu. `m1-naive-course-list` đánh dấu phiên bản naive có static course list, course card và navigation sang detail để làm chất liệu refactor. `m2-domain-modeling` bắt đầu tách domain layer. `m3-data-mock` thêm data layer mock. `m4-course-list-bloc` đưa Course List sang event/state BLoC. `m5-course-detail-enrollment` đưa Course Detail và enroll flow sang BLoC/use case. `m6-my-learning-progress` thêm My Learning và progress local mock bằng Cubit.
 
 ## Checkout một tag để học
 

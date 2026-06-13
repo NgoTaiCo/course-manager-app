@@ -1,8 +1,10 @@
 import 'course.dart';
 import 'data/datasources/mock_enrollment_data_source.dart';
 import 'data/datasources/mock_course_data_source.dart';
+import 'data/datasources/mock_learning_data_source.dart';
 import 'data/repositories/mock_enrollment_repository.dart';
 import 'data/repositories/mock_course_repository.dart';
+import 'data/repositories/mock_learning_repository.dart';
 
 /// Nơi lắp dependency tạm cho feature course.
 ///
@@ -44,6 +46,34 @@ CourseDetailBloc createCourseDetailBloc({
     getCourseDetail: getCourseDetail,
     enrollCourse: enrollCourse,
     // User giả lập cho A01. Auth thật nằm ngoài phạm vi milestone này.
+    currentUserId: 'learner_01',
+  );
+}
+
+/// Tạo MyLearningCubit với progress local mock.
+///
+/// M6 dùng Cubit vì flow chỉ có load và update progress, chưa cần event class.
+MyLearningCubit createMyLearningCubit({
+  bool shouldFail = false,
+}) {
+  const courseDataSource = MockCourseDataSource();
+  const courseRepository = MockCourseRepository(courseDataSource);
+
+  final learningDataSource = MockLearningDataSource(
+    shouldFail: shouldFail,
+  );
+  final learningRepository = MockLearningRepository(
+    learningDataSource: learningDataSource,
+    courseRepository: courseRepository,
+  );
+
+  final getMyCourses = GetMyCourses(learningRepository);
+  final updateLessonProgress = UpdateLessonProgress(learningRepository);
+
+  return MyLearningCubit(
+    getMyCourses: getMyCourses,
+    updateLessonProgress: updateLessonProgress,
+    // User giả lập cho A01. Auth thật nằm ngoài scope.
     currentUserId: 'learner_01',
   );
 }

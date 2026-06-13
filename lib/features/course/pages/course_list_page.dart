@@ -5,6 +5,7 @@ import '../course.dart';
 import '../course_dependencies.dart';
 import '../widgets/course_card.dart';
 import 'course_detail_page.dart';
+import 'my_learning_page.dart';
 
 /// Màn hình danh sách khóa học.
 ///
@@ -40,6 +41,19 @@ class _CourseListView extends StatelessWidget {
         title: const Text('Khóa học'),
         actions: [
           IconButton(
+            tooltip: 'Khóa học của tôi',
+            icon: const Icon(Icons.school_outlined),
+            onPressed: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (_) => const MyLearningPage(),
+                ),
+              );
+            },
+          ),
+          IconButton(
+            tooltip: 'Tìm kiếm',
             icon: const Icon(Icons.search),
             onPressed: () {
               // TODO: Thêm search ở milestone/bài tập sau.

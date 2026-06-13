@@ -118,12 +118,15 @@ lib/
         mappers/
           course_mapper.dart
           enrollment_mapper.dart
+          user_progress_mapper.dart
         models/
           course_model.dart
           enrollment_model.dart
+          user_progress_model.dart
         repositories/
           mock_course_repository.dart
           mock_enrollment_repository.dart
+          mock_learning_repository.dart
       domain/
         entities/
           course.dart
@@ -133,10 +136,13 @@ lib/
         repositories/
           course_repository.dart
           enrollment_repository.dart
+          learning_repository.dart
         usecases/
           enroll_course.dart
           get_course_detail.dart
           get_courses.dart
+          get_my_courses.dart
+          update_lesson_progress.dart
       presentation/
         bloc/
           course_list_bloc.dart
@@ -145,6 +151,9 @@ lib/
           course_detail_bloc.dart
           course_detail_event.dart
           course_detail_state.dart
+        cubit/
+          my_learning_cubit.dart
+          my_learning_state.dart
       pages/
         course_list_page.dart
         course_detail_page.dart
@@ -158,27 +167,37 @@ Current meaning:
 - `course_data.dart`: local mock data represented as `CourseModel`.
 - `data/models/course_model.dart`: raw data-layer model.
 - `data/models/enrollment_model.dart`: raw data-layer model for enrollment.
+- `data/models/user_progress_model.dart`: raw data-layer model for progress.
 - `data/datasources/mock_course_data_source.dart`: mock data source with fake delay/fake error.
 - `data/datasources/mock_enrollment_data_source.dart`: mock data source for enroll with fake failure.
+- `data/datasources/mock_learning_data_source.dart`: mock data source that stores local in-memory progress.
 - `data/mappers/course_mapper.dart`: mapper from `CourseModel`, parsed from JSON-like maps, to domain `Course`.
 - `data/mappers/enrollment_mapper.dart`: mapper from `EnrollmentModel` to domain `Enrollment`.
+- `data/mappers/user_progress_mapper.dart`: mapper from `UserProgressModel` to domain `UserProgress`.
 - `data/repositories/mock_course_repository.dart`: repository implementation that returns domain entities.
 - `data/repositories/mock_enrollment_repository.dart`: repository implementation for enrollment flow.
+- `data/repositories/mock_learning_repository.dart`: repository implementation for My Learning/progress.
 - `domain/entities/`: domain entities with no Flutter or data-package imports.
 - `domain/repositories/course_repository.dart`: repository contract.
 - `domain/repositories/enrollment_repository.dart`: repository contract for enroll.
+- `domain/repositories/learning_repository.dart`: repository contract for My Learning/progress.
 - `domain/usecases/get_courses.dart`: first use case.
 - `domain/usecases/get_course_detail.dart`: use case for loading detail by id.
 - `domain/usecases/enroll_course.dart`: use case for enrolling into a course.
+- `domain/usecases/get_my_courses.dart`: use case for loading my courses.
+- `domain/usecases/update_lesson_progress.dart`: use case for updating lesson progress.
 - `presentation/bloc/`: CourseListBloc and CourseDetailBloc with their events/states.
+- `presentation/cubit/`: MyLearningCubit for the simpler progress flow.
 - `course_list_page.dart`: list screen rendered from BLoC state, with no direct data-source call.
 - `course_detail_page.dart`: detail screen loaded by course id and enrolls through BLoC.
+- `my_learning_page.dart`: my courses screen with local progress updates.
 - `course_detail_page.dart`: detail screen still receives `Course` directly and will be refactored in later milestones.
 - `course_card.dart`: UI widget for displaying a course.
 - `docs/architecture/m2-domain-modeling.md`: entity/use case diagram for milestone 2.
 - `docs/architecture/m3-data-mock.md`: data source/mapper/repository diagram for milestone 3.
 - `docs/architecture/m4-course-list-bloc.md`: event/state diagram for milestone 4.
 - `docs/architecture/m5-course-detail-enrollment.md`: detail/enrollment flow diagram for milestone 5.
+- `docs/architecture/m6-my-learning-progress.md`: My Learning/progress diagram for milestone 6.
 
 Later milestones can evolve this into a feature-first Clean Architecture structure:
 
@@ -207,16 +226,16 @@ Available tags:
 | `m3-data-mock` | Mock data source, repository implementation, mapper | Available |
 | `m4-course-list-bloc` | CourseListBloc, event/state, UI rendering from state | Available |
 | `m5-course-detail-enrollment` | Course detail BLoC, `GetCourseDetail`, `EnrollCourse` | Available |
+| `m6-my-learning-progress` | My Learning screen, `GetMyCourses`, `UpdateLessonProgress` | Available |
 
 Planned tags for later modules:
 
 | Tag | Goal |
 |---|---|
-| `m6-my-learning-progress` | My Learning and progress flow |
 | `m7-refactor-review` | Refactor, boundary review, production checklist |
 | `m8-ai-workflow` | AI-assisted review/refactor workflow |
 
-Note: `m0-setup` marks the initial runnable Flutter project. `m1-naive-course-list` marks the naive version with a static course list, course card, and detail navigation as refactoring material. `m2-domain-modeling` starts separating the domain layer. `m3-data-mock` adds the mock data layer. `m4-course-list-bloc` moves Course List to BLoC event/state. `m5-course-detail-enrollment` moves Course Detail and enrollment flow to BLoC/use cases.
+Note: `m0-setup` marks the initial runnable Flutter project. `m1-naive-course-list` marks the naive version with a static course list, course card, and detail navigation as refactoring material. `m2-domain-modeling` starts separating the domain layer. `m3-data-mock` adds the mock data layer. `m4-course-list-bloc` moves Course List to BLoC event/state. `m5-course-detail-enrollment` moves Course Detail and enrollment flow to BLoC/use cases. `m6-my-learning-progress` adds My Learning and local mock progress with Cubit.
 
 ## Checkout a tag for learning
 
