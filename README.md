@@ -129,6 +129,11 @@ lib/
           course_repository.dart
         usecases/
           get_courses.dart
+      presentation/
+        bloc/
+          course_list_bloc.dart
+          course_list_event.dart
+          course_list_state.dart
       pages/
         course_list_page.dart
         course_detail_page.dart
@@ -142,16 +147,18 @@ lib/
 - `course_data.dart`: mock data local ở dạng `CourseModel`.
 - `data/models/course_model.dart`: model dữ liệu thô của data layer.
 - `data/datasources/mock_course_data_source.dart`: mock data source có fake delay/fake error.
-- `data/mappers/course_mapper.dart`: mapper từ `CourseModel` sang domain `Course`.
+- `data/mappers/course_mapper.dart`: mapper từ `CourseModel` parse từ JSON-like map sang domain `Course`.
 - `data/repositories/mock_course_repository.dart`: repository implementation trả về domain entity.
 - `domain/entities/`: domain entities không import Flutter hoặc data package.
 - `domain/repositories/course_repository.dart`: repository contract.
 - `domain/usecases/get_courses.dart`: use case đầu tiên.
-- `course_list_page.dart`: màn hình list naive, còn chứa filter logic trong Widget.
+- `presentation/bloc/`: CourseListBloc, event, state cho loading/success/empty/failure.
+- `course_list_page.dart`: màn hình list render theo BLoC state, không gọi data source trực tiếp.
 - `course_detail_page.dart`: màn hình detail vẫn nhận trực tiếp `Course`, sẽ còn refactor ở các milestone sau.
 - `course_card.dart`: widget hiển thị course.
 - `docs/architecture/m2-domain-modeling.md`: sơ đồ entity/use case cho milestone 2.
 - `docs/architecture/m3-data-mock.md`: sơ đồ data source/mapper/repository cho milestone 3.
+- `docs/architecture/m4-course-list-bloc.md`: sơ đồ event/state cho milestone 4.
 
 Các milestone sau có thể mở rộng sang cấu trúc feature-first Clean Architecture:
 
@@ -178,18 +185,18 @@ Các tag hiện có:
 | `m1-naive-course-list` | Naive Course List để demo vấn đề | Có sẵn |
 | `m2-domain-modeling` | Domain entities, repository contract, `GetCourses` use case | Có sẵn |
 | `m3-data-mock` | Mock data source, repository implementation, mapper | Có sẵn |
+| `m4-course-list-bloc` | CourseListBloc, event/state, UI render theo state | Có sẵn |
 
 Các tag dự kiến cho những module tiếp theo:
 
 | Tag | Mục tiêu |
 |---|---|
-| `m4-course-list-bloc` | CourseListBloc, event/state, UI render theo state |
 | `m5-course-detail-enrollment` | Detail flow, enrollment use case |
 | `m6-my-learning-progress` | My Learning và progress flow |
 | `m7-refactor-review` | Refactor, review boundary, production checklist |
 | `m8-ai-workflow` | AI-assisted review/refactor workflow |
 
-Lưu ý: `m0-setup` đánh dấu project Flutter chạy được ban đầu. `m1-naive-course-list` đánh dấu phiên bản naive có static course list, course card và navigation sang detail để làm chất liệu refactor. `m2-domain-modeling` bắt đầu tách domain layer. `m3-data-mock` thêm data layer mock nhưng vẫn chưa dùng BLoC; phần BLoC dành cho `m4-course-list-bloc`.
+Lưu ý: `m0-setup` đánh dấu project Flutter chạy được ban đầu. `m1-naive-course-list` đánh dấu phiên bản naive có static course list, course card và navigation sang detail để làm chất liệu refactor. `m2-domain-modeling` bắt đầu tách domain layer. `m3-data-mock` thêm data layer mock. `m4-course-list-bloc` đưa Course List sang event/state BLoC.
 
 ## Checkout một tag để học
 

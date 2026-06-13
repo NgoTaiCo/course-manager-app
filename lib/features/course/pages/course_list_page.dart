@@ -1,61 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../course.dart';
-import '../data/datasources/mock_course_data_source.dart';
-import '../data/repositories/mock_course_repository.dart';
+import '../course_dependencies.dart';
 import '../widgets/course_card.dart';
 import 'course_detail_page.dart';
 
 /// Màn hình danh sách khóa học.
 ///
-/// Sau M3, màn hình này không đọc static list trực tiếp nữa.
+/// Sau M4, Widget không gọi data source hoặc use case trực tiếp nữa.
+/// UI chỉ gửi event vào `CourseListBloc` và render theo `CourseListState`.
+///
 /// Luồng hiện tại:
-/// UI -> GetCourses -> CourseRepository -> MockCourseDataSource.
+/// UI event -> CourseListBloc -> GetCourses -> CourseRepository -> DataSource.
 ///
-/// Vẫn còn điểm cố ý chưa hoàn thiện:
-/// - UI tự tạo dependency, chưa có DI.
-/// - UI dùng FutureBuilder, chưa có BLoC event/state.
-/// - Logic filter vẫn nằm trong Widget.
-///
-/// M4 sẽ thay FutureBuilder bằng CourseListBloc để biểu diễn
-/// loading/success/empty/failure rõ ràng hơn.
-class CourseListPage extends StatefulWidget {
+/// Điểm còn để dành cho các milestone sau:
+/// - Dependency đang được lắp thủ công trong `course_dependencies.dart`.
+/// - Search/pagination chưa làm.
+/// - Detail/enrollment chưa có BLoC riêng.
+class CourseListPage extends StatelessWidget {
   const CourseListPage({super.key});
 
   @override
-  State<CourseListPage> createState() => _CourseListPageState();
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => createCourseListBloc()..add(const CourseListStarted()),
+      child: const _CourseListView(),
+    );
+  }
 }
 
-class _CourseListPageState extends State<CourseListPage> {
-  final GetCourses _getCourses = const GetCourses(
-    MockCourseRepository(
-      MockCourseDataSource(
-        // Đổi thành true để demo lỗi loading/failure trước khi sang BLoC.
-        shouldFail: false,
-      ),
-    ),
-  );
-
-  // Filter state nằm thẳng trong Widget
-  CourseStatus? _selectedStatus; // null = Tất cả
-  late Future<List<Course>> _coursesFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _coursesFuture = _getCourses();
-  }
-
-  List<Course> _filterCourses(List<Course> courses) {
-    // Logic lọc viết thẳng trong Widget
-    if (_selectedStatus == null) return courses;
-    return courses.where((c) => c.status == _selectedStatus).toList();
-  }
-
-  void _reloadCourses() {
-    setState(() {
-      _coursesFuture = _getCourses();
-    });
-  }
+class _CourseListView extends StatelessWidget {
+  const _CourseListView();
 
   @override
   Widget build(BuildContext context) {
@@ -66,21 +42,26 @@ class _CourseListPageState extends State<CourseListPage> {
           IconButton(
             icon: const Icon(Icons.search),
             onPressed: () {
-              // TODO: Thêm search
+              // TODO: Thêm search ở milestone/bài tập sau.
             },
           ),
         ],
       ),
-      body: Column(
+      body: const Column(
         children: [
-          _buildFilterChips(),
-          Expanded(child: _buildCourseList()),
+          _CourseStatusFilters(),
+          Expanded(child: _CourseListBody()),
         ],
       ),
     );
   }
+}
 
-  Widget _buildFilterChips() {
+class _CourseStatusFilters extends StatelessWidget {
+  const _CourseStatusFilters();
+
+  @override
+  Widget build(BuildContext context) {
     final filters = [
       (null, 'Tất cả'),
       (CourseStatus.published, 'Đang mở'),
@@ -88,50 +69,66 @@ class _CourseListPageState extends State<CourseListPage> {
       (CourseStatus.archived, 'Lưu trữ'),
     ];
 
-    return SizedBox(
-      height: 48,
-      child: ListView(
-        scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        children: filters.map((filter) {
-          final (value, label) = filter;
-          final isSelected = _selectedStatus == value;
+    return BlocBuilder<CourseListBloc, CourseListState>(
+      buildWhen: (previous, current) =>
+          previous.selectedStatus != current.selectedStatus,
+      builder: (context, state) {
+        return SizedBox(
+          height: 48,
+          child: ListView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            children: filters.map((filter) {
+              final (value, label) = filter;
+              final isSelected = state.selectedStatus == value;
 
-          return Padding(
-            padding: const EdgeInsets.only(right: 8),
-            child: FilterChip(
-              label: Text(label),
-              selected: isSelected,
-              onSelected: (_) => setState(() => _selectedStatus = value),
-            ),
-          );
-        }).toList(),
-      ),
+              return Padding(
+                padding: const EdgeInsets.only(right: 8),
+                child: FilterChip(
+                  label: Text(label),
+                  selected: isSelected,
+                  onSelected: (_) {
+                    context.read<CourseListBloc>().add(
+                          CourseListStatusFilterChanged(value),
+                        );
+                  },
+                ),
+              );
+            }).toList(),
+          ),
+        );
+      },
     );
   }
+}
 
-  Widget _buildCourseList() {
-    return FutureBuilder<List<Course>>(
-      future: _coursesFuture,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState != ConnectionState.done) {
+class _CourseListBody extends StatelessWidget {
+  const _CourseListBody();
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CourseListBloc, CourseListState>(
+      builder: (context, state) {
+        if (state.isInitial || state.isLoading) {
           return const Center(child: CircularProgressIndicator());
         }
 
-        if (snapshot.hasError) {
+        if (state.isFailure) {
           return _CourseListError(
-            message: 'Không thể tải danh sách khóa học.',
-            onRetry: _reloadCourses,
+            message: state.errorMessage ?? 'Không thể tải danh sách khóa học.',
+            onRetry: () {
+              context.read<CourseListBloc>().add(const CourseListRetried());
+            },
           );
         }
 
-        final courses = _filterCourses(snapshot.data ?? const []);
-
-        if (courses.isEmpty) {
+        if (state.isEmpty) {
           return const Center(
             child: Text('Không có khóa học nào.'),
           );
         }
+
+        final courses = state.visibleCourses;
 
         return ListView.separated(
           padding: const EdgeInsets.fromLTRB(16, 8, 16, 24),

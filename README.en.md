@@ -131,6 +131,11 @@ lib/
           course_repository.dart
         usecases/
           get_courses.dart
+      presentation/
+        bloc/
+          course_list_bloc.dart
+          course_list_event.dart
+          course_list_state.dart
       pages/
         course_list_page.dart
         course_detail_page.dart
@@ -144,16 +149,18 @@ Current meaning:
 - `course_data.dart`: local mock data represented as `CourseModel`.
 - `data/models/course_model.dart`: raw data-layer model.
 - `data/datasources/mock_course_data_source.dart`: mock data source with fake delay/fake error.
-- `data/mappers/course_mapper.dart`: mapper from `CourseModel` to domain `Course`.
+- `data/mappers/course_mapper.dart`: mapper from `CourseModel`, parsed from JSON-like maps, to domain `Course`.
 - `data/repositories/mock_course_repository.dart`: repository implementation that returns domain entities.
 - `domain/entities/`: domain entities with no Flutter or data-package imports.
 - `domain/repositories/course_repository.dart`: repository contract.
 - `domain/usecases/get_courses.dart`: first use case.
-- `course_list_page.dart`: naive list screen with filter logic still inside the Widget.
+- `presentation/bloc/`: CourseListBloc, event, and state for loading/success/empty/failure.
+- `course_list_page.dart`: list screen rendered from BLoC state, with no direct data-source call.
 - `course_detail_page.dart`: detail screen still receives `Course` directly and will be refactored in later milestones.
 - `course_card.dart`: UI widget for displaying a course.
 - `docs/architecture/m2-domain-modeling.md`: entity/use case diagram for milestone 2.
 - `docs/architecture/m3-data-mock.md`: data source/mapper/repository diagram for milestone 3.
+- `docs/architecture/m4-course-list-bloc.md`: event/state diagram for milestone 4.
 
 Later milestones can evolve this into a feature-first Clean Architecture structure:
 
@@ -180,18 +187,18 @@ Available tags:
 | `m1-naive-course-list` | Naive Course List used to demonstrate problems | Available |
 | `m2-domain-modeling` | Domain entities, repository contract, `GetCourses` use case | Available |
 | `m3-data-mock` | Mock data source, repository implementation, mapper | Available |
+| `m4-course-list-bloc` | CourseListBloc, event/state, UI rendering from state | Available |
 
 Planned tags for later modules:
 
 | Tag | Goal |
 |---|---|
-| `m4-course-list-bloc` | CourseListBloc, event/state, UI rendering from state |
 | `m5-course-detail-enrollment` | Detail flow and enrollment use case |
 | `m6-my-learning-progress` | My Learning and progress flow |
 | `m7-refactor-review` | Refactor, boundary review, production checklist |
 | `m8-ai-workflow` | AI-assisted review/refactor workflow |
 
-Note: `m0-setup` marks the initial runnable Flutter project. `m1-naive-course-list` marks the naive version with a static course list, course card, and detail navigation as refactoring material. `m2-domain-modeling` starts separating the domain layer. `m3-data-mock` adds the mock data layer but still does not use BLoC; BLoC belongs to `m4-course-list-bloc`.
+Note: `m0-setup` marks the initial runnable Flutter project. `m1-naive-course-list` marks the naive version with a static course list, course card, and detail navigation as refactoring material. `m2-domain-modeling` starts separating the domain layer. `m3-data-mock` adds the mock data layer. `m4-course-list-bloc` moves Course List to BLoC event/state.
 
 ## Checkout a tag for learning
 

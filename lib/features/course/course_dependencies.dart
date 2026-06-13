@@ -1,0 +1,20 @@
+import 'course.dart';
+import 'data/datasources/mock_course_data_source.dart';
+import 'data/repositories/mock_course_repository.dart';
+
+/// Nơi lắp dependency tạm cho feature course.
+///
+/// M4 chưa đưa `get_it` vào để tránh làm bài học quá nặng.
+/// File này giúp UI không phải import data source/repository trực tiếp.
+CourseListBloc createCourseListBloc({
+  bool shouldFail = false,
+}) {
+  final dataSource = MockCourseDataSource(
+    // Đổi thành true để demo lỗi loading/failure.
+    shouldFail: shouldFail,
+  );
+  final repository = MockCourseRepository(dataSource);
+  final getCourses = GetCourses(repository);
+
+  return CourseListBloc(getCourses: getCourses);
+}

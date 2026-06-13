@@ -28,7 +28,7 @@ class MockCourseDataSource {
       );
     }
 
-    return mockCourseModels;
+    return mockCourseJsonList.map(CourseModel.fromJson).toList();
   }
 
   /// Lấy một khóa học theo id từ mock list.
@@ -41,7 +41,9 @@ class MockCourseDataSource {
       );
     }
 
-    for (final course in mockCourseModels) {
+    final courses = mockCourseJsonList.map(CourseModel.fromJson);
+
+    for (final course in courses) {
       if (course.id == id) return course;
     }
 

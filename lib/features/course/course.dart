@@ -7,3 +7,6 @@ export 'domain/entities/lesson.dart';
 export 'domain/entities/user_progress.dart';
 export 'domain/repositories/course_repository.dart';
 export 'domain/usecases/get_courses.dart';
+export 'presentation/bloc/course_list_bloc.dart';
+export 'presentation/bloc/course_list_event.dart';
+export 'presentation/bloc/course_list_state.dart';
